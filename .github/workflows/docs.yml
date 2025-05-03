@@ -10,6 +10,11 @@ jobs:
   docs:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write      # needed to push to gh-pages
+      pages: write         # needed to deploy to Pages
+      id-token: write      # required for GitHub Pages deployments
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
