@@ -76,6 +76,18 @@
              
   <section id="debug-module">
 <h1>Debug Module<a class="headerlink" href="#debug-module" title="Link to this heading"></a></h1>
+<p>Debugging and logging utilities for embedded systems using JTAG-based
+inspection.</p>
+<p>This module provides lightweight debug logging suitable for embedded
+systems that lack traditional stdout or UART interfaces. Logging is stored
+in a RAM-based circular buffer and can be inspected live via JTAG.</p>
+<p>When the <cite>DEBUG</cite> macro is defined, functions and macros such as
+<cite>dbg_info()</cite>, <cite>dbg_assert()</cite>, and <cite>dbg_trace()</cite> become active. If <cite>DEBUG</cite>
+is undefined, all macros become no-ops via <cite>((void)0)</cite> for safe compilation.</p>
+<p>The debug log is stored in a static character buffer. Macros like
+<cite>dbg_info()</cite> write formatted strings into this buffer. The content can be
+retrieved via <cite>dbg_get_buffer()</cite> and viewed using tools like CCS memory
+view.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
