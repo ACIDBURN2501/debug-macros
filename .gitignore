@@ -1,8 +1,14 @@
-# General
+# Editor and OS metadata
 *.swp
 *.bak
 *.tmp
 *.DS_Store
+*.log
+*.pyc
+__pycache__/
+
+# Clangd / LSP cache
+.cache/
 
 # Build outputs
 /build/
@@ -15,13 +21,21 @@
 *.d
 
 # Sphinx build
-doc/sphinx/_build/
+doc/sphinx/build/
 
 # Doxygen
 *.doxyfile
 *.dox
+doc/sphinx/doxygen/
 
 # Editor and OS metadata
 *.log
 *.pyc
 __pycache__/
+
+# Ignore all generated Meson files
+/builddir/
+meson-private/
+meson-logs/
+# Ignore wrap fallback tarballs
+subprojects/packagecache/
