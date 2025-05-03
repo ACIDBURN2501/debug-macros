@@ -1,0 +1,27 @@
+# General
+*.swp
+*.bak
+*.tmp
+*.DS_Store
+
+# Build outputs
+/build/
+/build/*
+*.o
+*.obj
+*.elf
+*.map
+*.out
+*.d
+
+# Sphinx build
+doc/sphinx/_build/
+
+# Doxygen
+*.doxyfile
+*.dox
+
+# Editor and OS metadata
+*.log
+*.pyc
+__pycache__/
