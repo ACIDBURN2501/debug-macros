@@ -1,5 +1,6 @@
 # Debug Module for Embedded Systems
 
+[![Run Unity Tests](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/test.yml/badge.svg)](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/test.yml) [![Build Documentation](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/docs.yml/badge.svg)](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/docs.yml)
 This module provides lightweight debug logging suitable for embedded systems
 that lack traditional stdout or UART interfaces. Logging is stored in a
 RAM-based circular buffer and can be inspected live via JTAG.
