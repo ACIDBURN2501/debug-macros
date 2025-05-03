@@ -20,7 +20,7 @@ jobs:
           pip3 install meson
 
       - name: Configure project
-        run: meson setup builddir
+        run: meson setup build
 
       - name: Compile
         run: meson compile -C build
