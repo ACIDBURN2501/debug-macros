@@ -1,5 +1,8 @@
 # dbg
 
+
+[![Run Unity Tests](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/test.yml/badge.svg)](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/test.yml)  [![Build Documentation](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/docs.yml/badge.svg)](https://github.com/ACIDBURN2501/debug-macros/actions/workflows/docs.yml)
+
 Lightweight debug logging for embedded systems with RAM-based circular buffer and JTAG inspection.
 
 ## Features
