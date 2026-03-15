@@ -37,5 +37,7 @@ __pycache__/
 /builddir/
 meson-private/
 meson-logs/
+
 # Ignore wrap fallback tarballs
 subprojects/packagecache/
+subprojects/unity/

@@ -1,22 +1,58 @@
-project('debug-macros', 'c',
-  version: '0.1.0',
-  default_options: ['warning_level=3', 'c_std=c11']
+project(
+  'debug-macros',
+  'c',
+  version: '1.1.0',
+  default_options: ['warning_level=3', 'c_std=c11'],
 )
 
-lib_debug = static_library('debug',
-  sources: ['src/debug.c'],
-  include_directories: include_directories('include'),
+# ── Version header ─────────────────────────────────────────────────────────────
+
+ver = meson.project_version().split('.')
+
+major = ver[0].to_int()
+minor = ver[1].to_int()
+patch = ver[2].to_int()
+
+conf = configuration_data()
+conf.set_quoted('VERSION', meson.project_version())
+conf.set('MAJOR', major)
+conf.set('MINOR', minor)
+conf.set('PATCH', patch)
+
+configure_file(
+  input: 'config' / 'dbg_version.h.in',
+  output: 'dbg_version.h',
+  configuration: conf,
+  install: true,
+  install_dir: get_option('includedir') / 'dbg',
 )
 
-install_headers('include/debug.h', subdir: 'debug-macros')
+# ── Include directories ────────────────────────────────────────────────────────
 
-unity_proj = subproject('unity')
-test_dep = unity_proj.get_variable('unity_dep')
+public_headers = include_directories('include')
 
-test_exe = executable('test_debug',
-  sources: ['test/test_debug.c'],
-  include_directories: include_directories('include'),
-  dependencies: test_dep,
-  link_with: lib_debug
+# ── Application core library ───────────────────────────────────────────────────
+
+library_sources = ['src/dbg.c']
+
+dbg_lib = static_library(
+  'dbg',
+  library_sources,
+  include_directories: public_headers,
+  install: true,
+  install_dir: get_option('libdir'),
 )
-test('debug tests', test_exe)
+
+# Install public headers
+install_headers('include/dbg.h', subdir: 'dbg')
+
+dbg_dep = declare_dependency(
+  include_directories: public_headers,
+  link_with: dbg_lib,
+)
+
+# ── Host unit tests ────────────────────────────────────────────────────────────
+
+if get_option('build_tests')
+  subdir('tests')
+endif
