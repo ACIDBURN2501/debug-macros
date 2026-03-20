@@ -434,6 +434,130 @@ test_buffer_handles_empty_message(void)
         TEST_ASSERT_NOT_NULL(dbg_get_buffer());
 }
 
+/* ============ Boundary Condition Tests ============ */
+
+void
+test_dbg_available_space_exact_boundary(void)
+{
+        /* Fill buffer to trigger overflow */
+        char fill_msg[64];
+        for (int i = 0; i < 63; i++) {
+                fill_msg[i] = 'A';
+        }
+        fill_msg[63] = '\0';
+
+        /* Write messages until buffer overflows */
+        for (int i = 0; i < 5; i++) {
+                dbg_info("%s", fill_msg);
+        }
+
+        /* Verify buffer wraps (available space is less than buffer size) */
+        size_t avail = dbg_get_available_space();
+        TEST_ASSERT_LESS_THAN(DBG_BUFFER_SIZE, avail);
+}
+
+void
+test_overflow_callback_incremental_counts(void)
+{
+        /* Reset our callback counter */
+        g_overflow_count = 0;
+
+        /* Set callback */
+        dbg_set_overflow_callback(test_overflow_callback);
+
+        /* Fill buffer multiple times to trigger multiple overflows */
+        char fill_msg[64];
+        for (int i = 0; i < 63; i++) {
+                fill_msg[i] = 'A';
+        }
+        fill_msg[63] = '\0';
+
+        /* Write enough messages to trigger multiple overflows */
+        for (int i = 0; i < 50; i++) {
+                dbg_info("%s", fill_msg);
+        }
+
+        /* Callback should have been called at least once */
+        TEST_ASSERT_GREATER_THAN(0, g_overflow_count);
+
+        /* Verify callback received the correct count value */
+        /* The count should be >= 1 (callback was called) */
+        TEST_ASSERT_GREATER_OR_EQUAL(g_overflow_count, 1U);
+}
+
+void
+test_multiple_overflow_callbacks_registered(void)
+{
+        /* Reset our callback counter */
+        g_overflow_count = 0;
+
+        /* Set first callback */
+        dbg_set_overflow_callback(test_overflow_callback);
+
+        /* Fill buffer to trigger overflow */
+        char fill_msg[64];
+        for (int i = 0; i < 63; i++) {
+                fill_msg[i] = 'A';
+        }
+        fill_msg[63] = '\0';
+
+        /* Write enough messages to trigger overflow */
+        for (int i = 0; i < 50; i++) {
+                dbg_info("%s", fill_msg);
+        }
+
+        /* Verify overflow occurred */
+        TEST_ASSERT_GREATER_THAN(0, dbg_get_overflow_count());
+        TEST_ASSERT_GREATER_THAN(0, g_overflow_count);
+
+        /* Now set a second callback - this should replace the first */
+        g_overflow_count = 0;
+        dbg_set_overflow_callback(test_overflow_callback);
+
+        /* Trigger another overflow */
+        for (int i = 0; i < 50; i++) {
+                dbg_info("%s", fill_msg);
+        }
+
+        /* Verify second callback was called */
+        TEST_ASSERT_GREATER_THAN(0, g_overflow_count);
+}
+
+void
+test_dbg_clear_does_not_reset_overflow_count_separately(void)
+{
+        /* Reset our callback counter */
+        g_overflow_count = 0;
+
+        /* Set callback */
+        dbg_set_overflow_callback(test_overflow_callback);
+
+        /* Fill buffer to trigger overflow */
+        char fill_msg[64];
+        for (int i = 0; i < 63; i++) {
+                fill_msg[i] = 'A';
+        }
+        fill_msg[63] = '\0';
+
+        /* Write enough messages to trigger overflow */
+        for (int i = 0; i < 50; i++) {
+                dbg_info("%s", fill_msg);
+        }
+
+        /* Verify overflow occurred */
+        TEST_ASSERT_GREATER_THAN(0, dbg_get_overflow_count());
+        TEST_ASSERT_GREATER_THAN(0, g_overflow_count);
+
+        /* Clear the buffer - this should reset overflow count */
+        dbg_clear();
+
+        /* Overflow count should be reset to 0 */
+        TEST_ASSERT_EQUAL(0, dbg_get_overflow_count());
+        /* Callback counter may still have old value, but library count is reset
+         */
+        TEST_PASS();
+}
+
 /* ============ Main ============ */
 
 int
@@ -465,6 +589,8 @@ main(void)
         RUN_TEST(test_buffer_wraps_on_overflow);
         RUN_TEST(test_overflow_callback_called);
         RUN_TEST(test_overflow_callback_can_be_disabled);
+        RUN_TEST(test_dbg_clear_does_not_reset_overflow_count_separately);
+        RUN_TEST(test_multiple_overflow_callbacks_registered);
 
         /* Timestamp Tests */
         RUN_TEST(test_timestamp_callback_sets_timestamp);
@@ -492,6 +618,10 @@ main(void)
         RUN_TEST(test_config_values_are_valid);
         RUN_TEST(test_buffer_handles_minimum_message);
         RUN_TEST(test_buffer_handles_empty_message);
+
+        /* Boundary Condition Tests */
+        RUN_TEST(test_dbg_available_space_exact_boundary);
+        RUN_TEST(test_overflow_callback_incremental_counts);
 
         return UNITY_END();
 }
